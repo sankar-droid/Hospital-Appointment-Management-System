@@ -25,7 +25,6 @@ export class AuthService {
        const matched=await bcrypt.compare(dto.password,user.password);
        if(matched)
        {
-        const { password, ...userWithoutPassword } = user;
 		const payload={sub:user.id,email:user.email}
         return {
 		    access_token:await this.jwtservice.signAsync(payload),

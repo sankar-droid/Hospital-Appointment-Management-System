@@ -21,10 +21,15 @@ import { TimeslotModule } from './timeslot/timeslot.module';
 import { SpecializationModule } from './specialization/specialization.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthGuard } from './auth/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [AppointmentModule, AppointmentHistoryModule, ClientAccountModule, DoctorModule, DoctorDocumentModule, AppointmentStatusModule, DoctorSpecializationModule, DoctorUnavailabilityModule, HospitalAffiliationModule, InNetworkInsuranceModule, NotificationModule, OfficeModule, OfficedoctoravailabilityModule, UsersModule, QualificationModule, TimeslotModule, SpecializationModule, AuthModule,JwtModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaService,{
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    }],
 })
 export class AppModule {}
