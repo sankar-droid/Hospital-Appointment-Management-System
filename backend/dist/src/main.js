@@ -8,6 +8,7 @@ const swagger_1 = require("@nestjs/swagger");
 const CustomExceptionFilter_1 = require("./CustomExceptionFilter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors();
     app.useGlobalPipes(new common_1.ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Hospital Appointment Management API')

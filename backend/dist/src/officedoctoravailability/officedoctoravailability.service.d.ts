@@ -5,7 +5,7 @@ import { UpdateOfficeDoctorAvailabilityDTO } from './DTOS/updateofficedoctoravai
 export declare class OfficedoctoravailabilityService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    create(dto: createofficedoctoravailabilityDTO): Promise<BadRequestException | {
+    create(dto: createofficedoctoravailabilityDTO): Promise<{
         officeId: number;
         id: number;
         reason: string | null;
@@ -13,7 +13,7 @@ export declare class OfficedoctoravailabilityService {
         startTime: Date;
         endTime: Date;
         isAvailable: boolean;
-    }>;
+    } | BadRequestException>;
     findAll(officeId: number): Promise<{
         officeId: number;
         id: number;

@@ -4,22 +4,19 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-	
-	constructor(){
-	   const adapter = new PrismaMariaDb({
-			host: "127.0.0.1",
-			user: "root",
-			password: "Admin@123456789$1",
-			database: "hospitalbookingdb"
 
-	   });
-	   
-	   super({ adapter });
+	constructor() {
+		const adapter = new PrismaMariaDb({
+			host: '127.0.0.1',
+			port: 3306,
+			user: 'root',
+			password: 'admin',
+			database: 'hospitalmanagementdb',
+		});
+		super({ adapter });
 	}
 
 	async onModuleInit() {
 		await this.$connect();
 	}
-
-	
 }

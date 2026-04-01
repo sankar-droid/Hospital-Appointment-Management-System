@@ -1,5 +1,5 @@
 export const jwtconstants={
   
- secret:""  
+ secret:"5pedsx2eLntnQsedBjDnxPprivp9xkVg8GwoLTaimfh"  
   	
 }
