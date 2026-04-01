@@ -1,10 +1,15 @@
-import { Controller,Post,Get,Patch,Delete,ParseIntPipe,Param,Query,Body,HttpException,HttpStatus, UseFilters } from '@nestjs/common';
+import { Controller,Post,Get,Patch,Delete,ParseIntPipe,Param,Query,Body,HttpException,HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
 import { createofficedoctoravailabilityDTO } from './DTOS/creareofficedoctoravailabilityDTO';
 import { UpdateOfficeDoctorAvailabilityDTO } from './DTOS/updateofficedoctoravailabilityDTO';
 import { OfficedoctoravailabilityService } from './officedoctoravailability.service';
 import { CustomExceptionFilter } from 'src/CustomExceptionFilter';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/auth/role.guard';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('officedoctoravailability')
+@UseGuards(AuthGuard)
 export class OfficedoctoravailabilityController {
       constructor(
     private readonly service: OfficedoctoravailabilityService,
@@ -12,6 +17,8 @@ export class OfficedoctoravailabilityController {
 
   @Post()
   @UseFilters(new CustomExceptionFilter())
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
   create(@Body() dto: createofficedoctoravailabilityDTO ) {
     return this.service.create(dto);
   }
@@ -35,6 +42,8 @@ export class OfficedoctoravailabilityController {
   }
   @Patch(':id')
   @UseFilters(new CustomExceptionFilter())
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
   update(
     @Param('id',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
 	}))id:number,
@@ -45,6 +54,8 @@ export class OfficedoctoravailabilityController {
 	
   }
   @Delete(':id')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
     @UseFilters(new CustomExceptionFilter())
   remove(@Param('id',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
 	}))id:number) {

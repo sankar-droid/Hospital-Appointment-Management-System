@@ -27,6 +27,7 @@ export class AuthController {
 	
 	@Patch('/update/:id')
 	@UseFilters(new CustomExceptionFilter())
+	@UseGuards(AuthGuard)
 	update(@Param('id',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
 	}))id:number,dto:UpdateUserDTO)
 	{

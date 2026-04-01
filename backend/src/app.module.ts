@@ -23,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from './auth/role.guard';
 
 @Module({
   imports: [AppointmentModule, AppointmentHistoryModule, ClientAccountModule, DoctorModule, DoctorDocumentModule, AppointmentStatusModule, DoctorSpecializationModule, DoctorUnavailabilityModule, HospitalAffiliationModule, InNetworkInsuranceModule, NotificationModule, OfficeModule, OfficedoctoravailabilityModule, UsersModule, QualificationModule, TimeslotModule, SpecializationModule, AuthModule,JwtModule],
@@ -30,6 +31,9 @@ import { APP_GUARD } from '@nestjs/core';
   providers: [AppService, PrismaService,{
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },{
+      provide:APP_GUARD,
+      useClass: RoleGuard,
     }],
 })
 export class AppModule {}

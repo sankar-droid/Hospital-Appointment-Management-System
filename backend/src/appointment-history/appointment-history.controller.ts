@@ -1,9 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { AppointmentHistoryService } from './appointment-history.service';
 import { CreateAppointmentHistoryDto } from './DTOS/createAppointmentHistoryDTO';
 import { UpdateAppointmentHistoryDto } from './DTOS/updateAppointmentHistoryDTO';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role.enum';
+import { Roles } from 'src/auth/roles.decorator';
+import { RoleGuard } from 'src/auth/role.guard';
 
 @Controller('appointment-history')
+@UseGuards(AuthGuard)
 export class AppointmentHistoryController {
 
   constructor(private readonly appointmentHistoryService: AppointmentHistoryService) {}
@@ -14,6 +19,8 @@ export class AppointmentHistoryController {
   }
 
   @Get(':id')
+  @Roles(Role.Patient,Role.Doctor)
+  @UseGuards(RoleGuard)
   async findOne(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
     return await this.appointmentHistoryService.findOne(id);
   }

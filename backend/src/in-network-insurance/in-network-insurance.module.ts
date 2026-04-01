@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { InNetworkInsuranceController } from './in-network-insurance.controller';
 import { InNetworkInsuranceService } from './in-network-insurance.service';
 import { PrismaModule } from '../prisma/prisma.module';
-
+import { AuthGuard } from '../auth/auth.guard';
+import { RoleGuard } from '../auth/role.guard';
+import { Reflector } from '@nestjs/core';
 
 @Module({
   imports: [PrismaModule],
   controllers: [InNetworkInsuranceController],
-  providers: [InNetworkInsuranceService]
+  providers: [InNetworkInsuranceService, AuthGuard, RoleGuard, Reflector]
 })
 export class InNetworkInsuranceModule {}

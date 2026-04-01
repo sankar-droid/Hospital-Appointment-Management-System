@@ -1,21 +1,28 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseIntPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseIntPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { OfficeService } from './office.service';
 import { CreateOfficeDto } from './DTOS/createOfficeDTO';
 import { UpdateOfficeDto } from './DTOS/updateOfficeDTO';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RoleGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'src/auth/role.enum';
 
 @Controller('office')
+@UseGuards(AuthGuard, RoleGuard)
 export class OfficeController {
 
   constructor(private readonly officeService: OfficeService) {}
 
-  // GET /office
+  // Admin only — see all offices
   @Get()
+  @Roles(Role.Admin)
   async findAll() {
     return await this.officeService.findAll();
   }
 
-  // GET /office/search?city=&state=&country=&maxFee=
+  // Admin, Doctor, Patient — search offices by location/fee
   @Get('search')
+  @Roles(Role.Admin, Role.Doctor, Role.Patient)
   async search(
     @Query('city') city?: string,
     @Query('state') state?: string,
@@ -25,20 +32,23 @@ export class OfficeController {
     return await this.officeService.search(city, state, country, maxFee ? parseFloat(maxFee) : undefined);
   }
 
-  // GET /office/doctor/:doctorId
+  // Admin, Doctor, Patient — get all offices of a doctor
   @Get('doctor/:doctorId')
+  @Roles(Role.Admin, Role.Doctor, Role.Patient)
   async findByDoctor(@Param('doctorId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) doctorId: number) {
     return await this.officeService.findByDoctor(doctorId);
   }
 
-  // GET /office/:id/availability
+  // Admin, Doctor, Patient — get weekly availability schedule
   @Get(':id/availability')
+  @Roles(Role.Admin, Role.Doctor, Role.Patient)
   async getAvailability(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
     return await this.officeService.getAvailability(id);
   }
 
-  // GET /office/:id/timeslots/available?date=YYYY-MM-DD
+  // Admin, Doctor, Patient — get available time slots for a date
   @Get(':id/timeslots/available')
+  @Roles(Role.Admin, Role.Doctor, Role.Patient)
   async getAvailableTimeSlots(
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
     @Query('date') date: string
@@ -46,26 +56,30 @@ export class OfficeController {
     return await this.officeService.getAvailableTimeSlots(id, date);
   }
 
-  // GET /office/:id/insurances
+  // Admin, Doctor, Patient — get insurances of an office
   @Get(':id/insurances')
+  @Roles(Role.Admin, Role.Doctor, Role.Patient)
   async getInsurances(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
     return await this.officeService.getInsurances(id);
   }
 
-  // GET /office/:id
+  // Admin, Doctor — view single office
   @Get(':id')
+  @Roles(Role.Admin, Role.Doctor, Role.Patient)
   async findOne(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
     return await this.officeService.findOne(id);
   }
 
-  // POST /office
+  // Admin, Doctor — create office
   @Post()
+  @Roles(Role.Admin, Role.Doctor)
   async create(@Body() dto: CreateOfficeDto) {
     return await this.officeService.create(dto);
   }
 
-  // PATCH /office/:id
+  // Admin, Doctor — update office
   @Patch(':id')
+  @Roles(Role.Admin, Role.Doctor)
   async update(
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
     @Body() dto: UpdateOfficeDto
@@ -73,8 +87,9 @@ export class OfficeController {
     return await this.officeService.update(id, dto);
   }
 
-  // DELETE /office/:id
+  // Admin only — delete office
   @Delete(':id')
+  @Roles(Role.Admin)
   async remove(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
     return await this.officeService.remove(id);
   }
