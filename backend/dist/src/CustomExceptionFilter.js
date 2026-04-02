@@ -15,7 +15,7 @@ class CustomExceptionFilter {
         }
         else {
             status = common_1.HttpStatus.INTERNAL_SERVER_ERROR;
-            message = exception?.message || "Internal server error";
+            message = exception || "Internal server error";
         }
         response.status(status).json({
             statusCode: status,

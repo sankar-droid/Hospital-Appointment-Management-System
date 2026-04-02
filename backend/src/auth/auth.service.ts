@@ -22,6 +22,10 @@ export class AuthService {
        {
         throw new BadRequestException("User does not exist");
        }
+       if(!user.isActive)
+       {
+        throw new UnauthorizedException("Your account has been deactivated. Please contact admin");
+       }
        const matched=await bcrypt.compare(dto.password,user.password);
        if(matched)
        {

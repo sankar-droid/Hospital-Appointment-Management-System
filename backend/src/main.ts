@@ -9,23 +9,13 @@ import { CustomExceptionFilter } from './CustomExceptionFilter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-   app.useGlobalPipes(new ValidationPipe({transform:true,whitelist:true,forbidNonWhitelisted:true}));
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
 
-   const config = new DocumentBuilder()
+  const config = new DocumentBuilder()
     .setTitle('Hospital Appointment Management API')
     .setDescription('The hospital appointment management API')
     .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth', 
-    )
+    .addBearerAuth()
     .addTag('hospital-appointment-management')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);

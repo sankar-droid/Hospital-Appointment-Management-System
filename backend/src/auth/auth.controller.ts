@@ -13,12 +13,13 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { Role } from './role.enum';
 import { user } from './user.decorator';
 @Controller('auth')
-@ApiBearerAuth('JWT-auth')
+@ApiBearerAuth()
 export class AuthController {
 	
 	constructor(private readonly service:AuthService,private readonly usersService:UsersService)
 	{}
 	@Public()
+
 	@Post('/create-patient')
 	@UseFilters(new CustomExceptionFilter())
 	create(@Body() dto:CreateUserDTO)
@@ -51,6 +52,7 @@ export class AuthController {
 	{
 		return this.service.Login(dto);
 	}
+
 	@UseGuards(AuthGuard)
 	@Get('profile')
 	getProfile(@Request() req)

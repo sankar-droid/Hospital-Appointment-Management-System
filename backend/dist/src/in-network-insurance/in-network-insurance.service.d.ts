@@ -4,97 +4,59 @@ import { UpdateInNetworkInsuranceDto } from './DTOS/updateInNetworkInsuranceDTO'
 export declare class InNetworkInsuranceService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    findAll(): Promise<({
-        office: {
+    findAll(): import(".prisma/client").Prisma.PrismaPromise<({
+        doctorHospital: {
             id: number;
             doctorId: number;
-            city: string;
-            country: string;
-            hospitalAffiliationId: number | null;
+            city: string | null;
+            country: string | null;
             timeSlotPerClientInMin: number;
             firstConsultationFee: number;
             followupConsultationFee: number;
-            streetAddress: string;
-            state: string;
-            zip: string;
+            streetAddress: string | null;
+            state: string | null;
+            zip: string | null;
+            hospitalId: number | null;
+            isPrivate: boolean;
         };
     } & {
-        officeId: number;
         id: number;
         insuranceName: string;
+        doctorHospitalId: number;
     })[]>;
     findOne(id: number): Promise<{
-        office: {
+        doctorHospital: {
             id: number;
             doctorId: number;
-            city: string;
-            country: string;
-            hospitalAffiliationId: number | null;
+            city: string | null;
+            country: string | null;
             timeSlotPerClientInMin: number;
             firstConsultationFee: number;
             followupConsultationFee: number;
-            streetAddress: string;
-            state: string;
-            zip: string;
+            streetAddress: string | null;
+            state: string | null;
+            zip: string | null;
+            hospitalId: number | null;
+            isPrivate: boolean;
         };
     } & {
-        officeId: number;
         id: number;
         insuranceName: string;
+        doctorHospitalId: number;
     }>;
-    create(data: CreateInNetworkInsuranceDto): Promise<{
-        officeId: number;
+    create(data: CreateInNetworkInsuranceDto): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
         id: number;
         insuranceName: string;
-    }>;
-    update(id: number, data: UpdateInNetworkInsuranceDto): Promise<{
-        officeId: number;
+        doctorHospitalId: number;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+    update(id: number, data: UpdateInNetworkInsuranceDto): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
         id: number;
         insuranceName: string;
-    }>;
-    remove(id: number): Promise<{
-        officeId: number;
+        doctorHospitalId: number;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+    remove(id: number): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
         id: number;
         insuranceName: string;
-    }>;
-    findByOffice(officeId: number): Promise<{
-        officeId: number;
-        id: number;
-        insuranceName: string;
-    }[]>;
-    search(name: string): Promise<({
-        office: {
-            doctor: {
-                id: number;
-                createdAt: Date;
-                updatedAt: Date;
-                userId: number;
-                firstName: string;
-                lastName: string;
-                professionalStatement: string | null;
-                practicingFrom: Date | null;
-                isVerified: boolean;
-            };
-        } & {
-            id: number;
-            doctorId: number;
-            city: string;
-            country: string;
-            hospitalAffiliationId: number | null;
-            timeSlotPerClientInMin: number;
-            firstConsultationFee: number;
-            followupConsultationFee: number;
-            streetAddress: string;
-            state: string;
-            zip: string;
-        };
-    } & {
-        officeId: number;
-        id: number;
-        insuranceName: string;
-    })[]>;
-    removeAllByOffice(officeId: number): Promise<{
-        deleted: number;
-        message: string;
-    }>;
+        doctorHospitalId: number;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
 }

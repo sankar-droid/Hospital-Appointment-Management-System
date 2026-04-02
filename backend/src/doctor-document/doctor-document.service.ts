@@ -8,36 +8,34 @@ export class DoctorDocumentService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return await this.prisma.doctorDocument.findMany();
+  findAll() {
+    return this.prisma.doctorDocument.findMany();
   }
 
-  async findOne(id: number) {
-    return await this.prisma.doctorDocument.findUnique({ where: { id } });
+  findOne(id: number) {
+    return this.prisma.doctorDocument.findUnique({ where: { id } });
   }
 
-  async create(data: CreateDoctorDocumentDto) {
-    return await this.prisma.doctorDocument.create({
+  create(data: CreateDoctorDocumentDto) {
+    return this.prisma.doctorDocument.create({
       data: {
-        doctorId: data.doctorId,
         documentType: data.documentType,
-        fileUrl: Buffer.from(data.fileUrl),
+        fileUrl: Buffer.alloc(0),
+        doctor: { connect: { id: 0 } }
       }
     });
   }
 
-  async update(id: number, data: UpdateDoctorDocumentDto) {
-    return await this.prisma.doctorDocument.update({
+  update(id: number, data: UpdateDoctorDocumentDto) {
+    return this.prisma.doctorDocument.update({
       where: { id },
       data: {
-        ...(data.doctorId && { doctorId: data.doctorId }),
-        ...(data.documentType && { documentType: data.documentType }),
-        ...(data.fileUrl && { fileUrl: Buffer.from(data.fileUrl) }),
+        ...(data.documentType && { documentType: data.documentType })
       }
     });
   }
 
-  async remove(id: number) {
-    return await this.prisma.doctorDocument.delete({ where: { id } });
+  remove(id: number) {
+    return this.prisma.doctorDocument.delete({ where: { id } });
   }
 }

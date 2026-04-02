@@ -20,7 +20,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
       message = exception.getResponse();
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
-      message = (exception as any)?.message || "Internal server error";
+      message = (exception as any)|| "Internal server error";
     }
 
     response.status(status).json({

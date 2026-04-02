@@ -1,43 +1,24 @@
-import { IsInt, IsString, IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOfficeDto {
-  @IsInt()
-  @IsNotEmpty()
-  doctorId: number;
-
-  @IsInt()
-  @IsOptional()
-  hospitalAffiliationId?: number;
-
-  @IsInt()
-  @IsNotEmpty()
-  timeSlotPerClientInMin: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  firstConsultationFee: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  followupConsultationFee: number;
-
+  @ApiProperty({ example: 'MedCare - Hyderabad' })
   @IsString()
   @IsNotEmpty()
-  streetAddress: string;
+  name: string;
 
+  @ApiProperty({ example: 'Hyderabad' })
   @IsString()
   @IsNotEmpty()
   city: string;
 
+  @ApiProperty({ example: 'Telangana' })
   @IsString()
   @IsNotEmpty()
   state: string;
 
+  @ApiProperty({ example: 'India' })
   @IsString()
   @IsNotEmpty()
   country: string;
-
-  @IsString()
-  @IsNotEmpty()
-  zip: string;
 }

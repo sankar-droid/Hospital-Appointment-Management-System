@@ -1,12 +1,13 @@
-import { Injectable,BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDTO} from './DTOS/CreateUserDTO';
+import { CreateUserDTO } from './DTOS/CreateUserDTO';
 import { UpdateUserDTO } from './DTOS/UpdateUserDTO';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
+
 
     constructor(private readonly prisma:PrismaService)
     {
@@ -68,6 +69,6 @@ export class UsersService {
 		 
 		
 	}
-
-
 }
+
+   

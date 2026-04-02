@@ -8,20 +8,12 @@ const swagger_1 = require("@nestjs/swagger");
 const CustomExceptionFilter_1 = require("./CustomExceptionFilter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.enableCors();
-    app.useGlobalPipes(new common_1.ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
+    app.useGlobalPipes(new common_1.ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: false }));
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Hospital Appointment Management API')
         .setDescription('The hospital appointment management API')
         .setVersion('1.0')
-        .addBearerAuth({
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-    }, 'JWT-auth')
+        .addBearerAuth()
         .addTag('hospital-appointment-management')
         .build();
     const documentFactory = () => swagger_1.SwaggerModule.createDocument(app, config);

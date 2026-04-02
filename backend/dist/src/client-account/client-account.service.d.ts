@@ -6,42 +6,42 @@ export declare class ClientAccountService {
     constructor(prisma: PrismaService);
     findAll(): Promise<{
         id: number;
+        email: string;
         userId: number;
         firstName: string;
         lastName: string;
         contactNumber: string;
-        email: string;
     }[]>;
     findOne(id: number): Promise<{
         id: number;
+        email: string;
         userId: number;
         firstName: string;
         lastName: string;
         contactNumber: string;
-        email: string;
     } | null>;
     create(data: CreateClientAccountDto): Promise<{
         id: number;
+        email: string;
         userId: number;
         firstName: string;
         lastName: string;
         contactNumber: string;
-        email: string;
     }>;
     update(id: number, data: UpdateClientAccountDto): Promise<{
         id: number;
+        email: string;
         userId: number;
         firstName: string;
         lastName: string;
         contactNumber: string;
-        email: string;
     }>;
     remove(id: number): Promise<{
         id: number;
+        email: string;
         userId: number;
         firstName: string;
         lastName: string;
         contactNumber: string;
-        email: string;
     }>;
 }

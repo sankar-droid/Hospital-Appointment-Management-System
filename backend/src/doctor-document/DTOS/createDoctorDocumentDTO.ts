@@ -1,15 +1,9 @@
-import { IsInt, IsString, IsArray, ArrayNotEmpty, IsNotEmpty } from 'class-validator';
+import { IsInt, IsString, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateDoctorDocumentDto {
-  @IsInt()
-  @IsNotEmpty()
-  doctorId: number;
-
+  @ApiProperty({ example: 'License' })
   @IsString()
   @IsNotEmpty()
   documentType: string;
-
-  @IsArray()
-  @ArrayNotEmpty()
-  fileUrl: number[];
 }

@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
   previewFeatures = ["relationJoins"]
@@ -12,219 +10,232 @@ generator client {
 datasource db {
   provider = "mysql"
 }
-model User{
-    id         Int      @id @default(autoincrement())
-	email      String   @unique
-	password   String 
-	role       String    @default("Patient")
-	isActive   Boolean  @default(true)
-	createdAt  DateTime @default(now())
-	updatedAt  DateTime @updatedAt
-	
-	doctor     Doctor?
-	client     ClientAccount?
-	notifications Notification[]
-  
 
-}
-
-model Doctor {
-  id                       Int      @id @default(autoincrement())
-  userId                   Int      @unique
-  firstName                String
-  lastName                 String
-  professionalStatement    String?
-  practicingFrom           DateTime?
-  isVerified               Boolean  @default(false)
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-
-  user                     User     @relation(fields: [userId], references: [id],onDelete: NoAction,onUpdate: Cascade)
-  documents                DoctorDocument[]
-  specializations          DoctorSpecialization[]
-  qualifications           Qualification[]
-  hospitalAffiliations     HospitalAffiliation[]
-  unavailability           DoctorUnavailability[]
-  offices                  Office[]
-}
-
-
-model DoctorDocument {
-  id          Int      @id @default(autoincrement())
-  doctorId    Int
-  documentType String
-  fileUrl     Bytes
-  uploadedAt  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  doctor      Doctor   @relation(fields: [doctorId], references: [id])
-}
-
-
-model Specialization {
-  id                   Int      @id @default(autoincrement())
-  specializationName   String
-
-  doctors              DoctorSpecialization[]
-}
-
-model DoctorSpecialization {
-  id                Int @id @default(autoincrement())
-  doctorId          Int
-  specializationId  Int
-
-  doctor            Doctor         @relation(fields: [doctorId], references: [id])
-  specialization    Specialization @relation(fields: [specializationId], references: [id])
-}
-
-
-model Qualification {
-  id                 Int      @id @default(autoincrement())
-  doctorId           Int
-  qualificationName  String
-  instituteName      String
-  procurementYear    DateTime?
-
-  doctor             Doctor   @relation(fields: [doctorId], references: [id])
-}
-
-
-model HospitalAffiliation {
+model User {
   id         Int      @id @default(autoincrement())
-  doctorId   Int
-  hospitalName String
-  city       String
-  country    String
-  startDate  DateTime?
-  endDate    DateTime?
-
-  doctor     Doctor   @relation(fields: [doctorId], references: [id],onDelete: NoAction)
-  offices    Office[]
-}
-
-
-model DoctorUnavailability {
-  id        Int      @id @default(autoincrement())
-  doctorId  Int
-  date      DateTime
-  reason    String?
-
-  doctor    Doctor   @relation(fields: [doctorId], references: [id])
-}
-
-
-model ClientAccount {
-  id             Int      @id @default(autoincrement())
-  userId         Int      @unique
-  firstName      String
-  lastName       String
-  contactNumber  String
-  email          String
-
-  user           User     @relation(fields: [userId], references: [id])
-  appointments   Appointment[]
-}
-
-model Office {
-  id                           Int      @id @default(autoincrement())
-  doctorId                     Int
-  hospitalAffiliationId        Int?
-  timeSlotPerClientInMin       Int
-  firstConsultationFee         Float
-  followupConsultationFee      Float
-  streetAddress                String
-  city                         String
-  state                        String
-  country                      String
-  zip                          String
-
-  doctor                       Doctor   @relation(fields: [doctorId], references: [id],onDelete: NoAction,onUpdate: NoAction)
-  hospitalAffiliation          HospitalAffiliation? @relation(fields: [hospitalAffiliationId], references: [id],onDelete: NoAction,onUpdate: NoAction)
-
-  availability                 OfficeDoctorAvailability[]
-  timeSlots                    TimeSlot[]
-  insurances                   InNetworkInsurance[]
-  appointments                 Appointment[]
-}
-
-model OfficeDoctorAvailability {
-  id        Int      @id @default(autoincrement())
-  officeId  Int
-  dayOfWeek String
-  startTime DateTime
-  endTime   DateTime
-  isAvailable Boolean @default(true)
-  reason    String?
-
-  office    Office   @relation(fields: [officeId], references: [id],onDelete: Cascade)
-}
-
-model InNetworkInsurance {
-  id            Int    @id @default(autoincrement())
-  officeId      Int
-  insuranceName String
-
-  office        Office @relation(fields: [officeId], references: [id],onDelete: Cascade)
-}
-
-model TimeSlot {
-  id         Int      @id @default(autoincrement())
-  officeId   Int
-  startTime  DateTime
-  endTime    DateTime
-  isBooked   Boolean  @default(false)
+  email      String   @unique
+  password   String
+  role       String   @default("Patient")
+  isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  office     Office   @relation(fields: [officeId], references: [id],onDelete: Cascade, onUpdate: NoAction)
+  doctor        Doctor?
+  client        ClientAccount?
+  notifications Notification[]
+}
+
+model Doctor {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique
+  firstName             String
+  lastName              String
+  professionalStatement String?
+  practicingFrom        DateTime?
+  isVerified            Boolean   @default(false)
+  verificationRequested Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user            User                  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  documents       DoctorDocument[]
+  specializations DoctorSpecialization[]
+  qualifications  Qualification[]
+  unavailability  DoctorUnavailability[]
+  doctorHospitals DoctorHospital[]
+}
+
+model DoctorDocument {
+  id           Int      @id @default(autoincrement())
+  doctorId     Int
+  documentType String
+  fileUrl      Bytes
+  uploadedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+}
+
+model Specialization {
+  id                 Int                  @id @default(autoincrement())
+  specializationName String
+
+  doctors DoctorSpecialization[]
+}
+
+model DoctorSpecialization {
+  id               Int @id @default(autoincrement())
+  doctorId         Int
+  specializationId Int
+
+  doctor         Doctor         @relation(fields: [doctorId], references: [id])
+  specialization Specialization @relation(fields: [specializationId], references: [id])
+}
+
+model Qualification {
+  id                Int       @id @default(autoincrement())
+  doctorId          Int
+  qualificationName String
+  instituteName     String
+  procurementYear   DateTime?
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+}
+
+model DoctorUnavailability {
+  id        Int       @id @default(autoincrement())
+  doctorId  Int
+  date      DateTime
+  startTime DateTime?
+  endTime   DateTime?
+  reason    String?
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+}
+
+model ClientAccount {
+  id            Int    @id @default(autoincrement())
+  userId        Int    @unique
+  firstName     String
+  lastName      String
+  contactNumber String
+  email         String
+
+  user         User          @relation(fields: [userId], references: [id])
   appointments Appointment[]
 }
 
+// ─── OFFICE (Admin managed region) ───────────────────────────────────────────
+
+model Office {
+  id       Int    @id @default(autoincrement())
+  name     String
+  city     String
+  state    String
+  country  String
+
+  hospitals Hospital[]
+}
+
+// ─── HOSPITAL (Under an office) ──────────────────────────────────────────────
+
+model Hospital {
+  id            Int    @id @default(autoincrement())
+  officeId      Int
+  name          String
+  streetAddress String
+  city          String
+  state         String
+  country       String
+  zip           String
+
+  office          Office           @relation(fields: [officeId], references: [id], onDelete: NoAction)
+  doctorHospitals DoctorHospital[]
+}
+
+// ─── DOCTOR HOSPITAL (Junction — handles affiliated + private practice) ───────
+
+model DoctorHospital {
+  id                      Int      @id @default(autoincrement())
+  doctorId                Int
+  hospitalId              Int?     // null = private practice
+  isPrivate               Boolean  @default(false)
+  streetAddress           String?  // only for private practice
+  city                    String?
+  state                   String?
+  country                 String?
+  zip                     String?
+  firstConsultationFee    Float
+  followupConsultationFee Float
+  timeSlotPerClientInMin  Int
+
+  doctor    Doctor    @relation(fields: [doctorId], references: [id], onDelete: NoAction)
+  hospital  Hospital? @relation(fields: [hospitalId], references: [id], onDelete: NoAction)
+
+  availability OfficeDoctorAvailability[]
+  timeSlots    TimeSlot[]
+  insurances   InNetworkInsurance[]
+  appointments Appointment[]
+}
+
+model OfficeDoctorAvailability {
+  id               Int      @id @default(autoincrement())
+  doctorHospitalId Int
+  dayOfWeek        String
+  startTime        DateTime
+  endTime          DateTime
+  isAvailable      Boolean  @default(true)
+  reason           String?
+
+  doctorHospital DoctorHospital @relation(fields: [doctorHospitalId], references: [id], onDelete: Cascade)
+}
+
+model InNetworkInsurance {
+  id               Int    @id @default(autoincrement())
+  doctorHospitalId Int
+  insuranceName    String
+
+  doctorHospital DoctorHospital @relation(fields: [doctorHospitalId], references: [id], onDelete: Cascade)
+}
+
+model TimeSlot {
+  id               Int      @id @default(autoincrement())
+  doctorHospitalId Int
+  startTime        DateTime
+  endTime          DateTime
+  isBooked         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  doctorHospital DoctorHospital @relation(fields: [doctorHospitalId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  appointments   Appointment[]
+}
+
 model AppointmentStatus {
-  id      Int     @id @default(autoincrement())
-  status  String
+  id     Int    @id @default(autoincrement())
+  status String
 
   appointments Appointment[]
 }
 
 model Appointment {
-  id                    Int      @id @default(autoincrement())
-  userAccountId         Int
-  officeId              Int
-  timeSlotId            Int
-  probableStartTime     DateTime
-  actualEndTime         DateTime?
-  durationInMinutes     Int
-  appointmentStatusId   Int
-  appointmentTakenDate  DateTime
-  cancellationReason    String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                   Int       @id @default(autoincrement())
+  userAccountId        Int
+  doctorHospitalId     Int
+  timeSlotId           Int
+  probableStartTime    DateTime
+  actualEndTime        DateTime?
+  durationInMinutes    Int
+  appointmentStatusId  Int
+  appointmentTakenDate DateTime
+  cancellationReason   String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  client        ClientAccount     @relation(fields: [userAccountId], references: [id],onDelete: NoAction,onUpdate: NoAction)
-  office        Office            @relation(fields: [officeId], references: [id],onDelete: NoAction, onUpdate: NoAction)
-  timeSlot      TimeSlot          @relation(fields: [timeSlotId], references: [id],onDelete: Cascade, onUpdate: Cascade)
-  status        AppointmentStatus @relation(fields: [appointmentStatusId], references: [id])
-  history       AppointmentHistory[]
+  client         ClientAccount  @relation(fields: [userAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  doctorHospital DoctorHospital @relation(fields: [doctorHospitalId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  timeSlot       TimeSlot       @relation(fields: [timeSlotId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  status         AppointmentStatus @relation(fields: [appointmentStatusId], references: [id])
+  history        AppointmentHistory[]
 }
 
 model AppointmentHistory {
-  id             Int      @id @default(autoincrement())
-  appointmentId  Int
-  oldTimeSlotId  Int
-  newTimeSlotId  Int
-  changedAt      DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  appointmentId Int
+  oldTimeSlotId Int
+  newTimeSlotId Int
+  changedAt     DateTime @default(now())
 
-  appointment    Appointment @relation(fields: [appointmentId], references: [id])
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
 }
 
 model Notification {
   id        Int      @id @default(autoincrement())
   userId    Int
   message   String
-  isRead    Boolean @default(false)
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
