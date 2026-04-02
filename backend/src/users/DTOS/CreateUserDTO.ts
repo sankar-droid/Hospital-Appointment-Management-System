@@ -8,12 +8,4 @@ export class CreateUserDTO{
   @IsString()
   @MinLength(6)
   password: string;
-
-  @IsOptional()
-  @IsString()
-  role?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 }

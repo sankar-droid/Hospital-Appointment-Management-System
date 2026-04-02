@@ -18,6 +18,10 @@ const creareofficedoctoravailabilityDTO_1 = require("./DTOS/creareofficedoctorav
 const updateofficedoctoravailabilityDTO_1 = require("./DTOS/updateofficedoctoravailabilityDTO");
 const officedoctoravailability_service_1 = require("./officedoctoravailability.service");
 const CustomExceptionFilter_1 = require("../CustomExceptionFilter");
+const auth_guard_1 = require("../auth/auth.guard");
+const role_guard_1 = require("../auth/role.guard");
+const role_enum_1 = require("../auth/role.enum");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let OfficedoctoravailabilityController = class OfficedoctoravailabilityController {
     service;
     constructor(service) {
@@ -43,6 +47,8 @@ exports.OfficedoctoravailabilityController = OfficedoctoravailabilityController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseFilters)(new CustomExceptionFilter_1.CustomExceptionFilter()),
+    (0, roles_decorator_1.Roles)(role_enum_1.Role.Doctor),
+    (0, common_1.UseGuards)(role_guard_1.RoleGuard),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [creareofficedoctoravailabilityDTO_1.createofficedoctoravailabilityDTO]),
@@ -69,6 +75,8 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, common_1.UseFilters)(new CustomExceptionFilter_1.CustomExceptionFilter()),
+    (0, roles_decorator_1.Roles)(role_enum_1.Role.Doctor),
+    (0, common_1.UseGuards)(role_guard_1.RoleGuard),
     __param(0, (0, common_1.Param)('id', new common_1.ParseIntPipe({ errorHttpStatusCode: common_1.HttpStatus.NOT_ACCEPTABLE
     }))),
     __param(1, (0, common_1.Body)()),
@@ -78,6 +86,8 @@ __decorate([
 ], OfficedoctoravailabilityController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Roles)(role_enum_1.Role.Doctor),
+    (0, common_1.UseGuards)(role_guard_1.RoleGuard),
     (0, common_1.UseFilters)(new CustomExceptionFilter_1.CustomExceptionFilter()),
     __param(0, (0, common_1.Param)('id', new common_1.ParseIntPipe({ errorHttpStatusCode: common_1.HttpStatus.NOT_ACCEPTABLE
     }))),
@@ -87,6 +97,7 @@ __decorate([
 ], OfficedoctoravailabilityController.prototype, "remove", null);
 exports.OfficedoctoravailabilityController = OfficedoctoravailabilityController = __decorate([
     (0, common_1.Controller)('officedoctoravailability'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     __metadata("design:paramtypes", [officedoctoravailability_service_1.OfficedoctoravailabilityService])
 ], OfficedoctoravailabilityController);
 //# sourceMappingURL=officedoctoravailability.controller.js.map

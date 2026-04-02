@@ -5,7 +5,7 @@ import { QualificationService } from './qualification.service';
 import { UseFilters } from '@nestjs/common';
 import { CustomExceptionFilter } from 'src/CustomExceptionFilter';
 import { HttpStatus } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/auth/role.enum';

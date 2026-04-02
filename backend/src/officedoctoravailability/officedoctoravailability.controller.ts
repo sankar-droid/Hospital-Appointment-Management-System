@@ -3,7 +3,7 @@ import { createofficedoctoravailabilityDTO } from './DTOS/creareofficedoctoravai
 import { UpdateOfficeDoctorAvailabilityDTO } from './DTOS/updateofficedoctoravailabilityDTO';
 import { OfficedoctoravailabilityService } from './officedoctoravailability.service';
 import { CustomExceptionFilter } from 'src/CustomExceptionFilter';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';

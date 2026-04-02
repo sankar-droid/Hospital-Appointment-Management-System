@@ -23,10 +23,11 @@ export class AppointmentController {
     return await this.appointmentService.findOne(id);
   }
 
-  @Post()
+  @Post('/create-patient')
   @Roles(Role.Patient)
   @UseGuards(RoleGuard)
   async create(@Body() createAppointmentDto: CreateAppointmentDto) {
+  
     return await this.appointmentService.create(createAppointmentDto);
   }
 

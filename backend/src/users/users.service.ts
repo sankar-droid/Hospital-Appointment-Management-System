@@ -12,7 +12,7 @@ export class UsersService {
     {
        
     }
-    async createUser(dto:CreateUserDTO):Promise<User>
+    async createUser(dto:CreateUserDTO,role:string):Promise<User>
     {
         const check =await this.prisma.user.findFirst({
             where:{
@@ -32,6 +32,8 @@ export class UsersService {
 		{
 		   data:{
               ...dto,
+			  role:role,
+			  isActive:true,
 			  createdAt:new Date(),
 			  updatedAt:new Date()
 		    
@@ -46,7 +48,12 @@ export class UsersService {
 	
 	async updateUser(id:number,dto:UpdateUserDTO)
 	{
-
+        
+		const salt=await bcrypt.genSalt();
+		if(dto.password)
+		{
+			dto.password=await bcrypt.hash(dto.password,salt);
+		}
 		return await this.prisma.user.update(
 		{
 		   where:{id},
