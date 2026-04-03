@@ -48,6 +48,7 @@ export declare class InNetworkInsuranceService {
         id: number;
         doctorHospitalId: number;
         insuranceName: string;
+<<<<<<< Updated upstream
     }>;
     update(userId: number, id: number, data: UpdateInNetworkInsuranceDto): Promise<{
         id: number;
@@ -59,4 +60,58 @@ export declare class InNetworkInsuranceService {
         doctorHospitalId: number;
         insuranceName: string;
     }>;
+=======
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+    update(id: number, data: UpdateInNetworkInsuranceDto): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
+        id: number;
+        doctorHospitalId: number;
+        insuranceName: string;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+    remove(id: number): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
+        id: number;
+        doctorHospitalId: number;
+        insuranceName: string;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+    search(name: string): import(".prisma/client").Prisma.PrismaPromise<({
+        doctorHospital: {
+            id: number;
+            doctorId: number;
+            hospitalId: number | null;
+            isPrivate: boolean;
+            streetAddress: string | null;
+            city: string | null;
+            state: string | null;
+            country: string | null;
+            zip: string | null;
+            firstConsultationFee: number;
+            followupConsultationFee: number;
+            timeSlotPerClientInMin: number;
+        };
+    } & {
+        id: number;
+        doctorHospitalId: number;
+        insuranceName: string;
+    })[]>;
+    findByOffice(officeId: number): import(".prisma/client").Prisma.PrismaPromise<({
+        doctorHospital: {
+            id: number;
+            doctorId: number;
+            hospitalId: number | null;
+            isPrivate: boolean;
+            streetAddress: string | null;
+            city: string | null;
+            state: string | null;
+            country: string | null;
+            zip: string | null;
+            firstConsultationFee: number;
+            followupConsultationFee: number;
+            timeSlotPerClientInMin: number;
+        };
+    } & {
+        id: number;
+        doctorHospitalId: number;
+        insuranceName: string;
+    })[]>;
+    removeAllByOffice(officeId: number): import(".prisma/client").Prisma.PrismaPromise<import(".prisma/client").Prisma.BatchPayload>;
+>>>>>>> Stashed changes
 }

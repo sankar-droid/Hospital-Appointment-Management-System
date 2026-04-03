@@ -63,4 +63,24 @@ export class InNetworkInsuranceService {
 
     return this.prisma.inNetworkInsurance.delete({ where: { id } });
   }
+
+  search(name: string) {
+    return this.prisma.inNetworkInsurance.findMany({
+      where: { insuranceName: { contains: name } },
+      include: { doctorHospital: true }
+    });
+  }
+
+  findByOffice(officeId: number) {
+    return this.prisma.inNetworkInsurance.findMany({
+      where: { doctorHospitalId: officeId },
+      include: { doctorHospital: true }
+    });
+  }
+
+  removeAllByOffice(officeId: number) {
+    return this.prisma.inNetworkInsurance.deleteMany({
+      where: { doctorHospitalId: officeId }
+    });
+  }
 }

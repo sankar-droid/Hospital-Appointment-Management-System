@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="180" fill="white" fill-opacity="0.1"/>
+
+  <!-- Doctor body -->
+  <rect x="140" y="200" width="120" height="130" rx="20" fill="white"/>
+
+  <!-- White coat -->
+  <rect x="130" y="210" width="140" height="120" rx="15" fill="#e8f0fe"/>
+  <rect x="155" y="210" width="90" height="120" rx="10" fill="white"/>
+
+  <!-- Stethoscope -->
+  <path d="M170 240 Q160 270 175 280 Q190 290 195 275" stroke="#2d6be4" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="195" cy="278" r="8" fill="#2d6be4"/>
+
+  <!-- Head -->
+  <circle cx="200" cy="160" r="50" fill="#FDDBB4"/>
+
+  <!-- Hair -->
+  <ellipse cx="200" cy="118" rx="50" ry="20" fill="#4a3728"/>
+  <rect x="150" y="118" width="100" height="25" rx="5" fill="#4a3728"/>
+
+  <!-- Eyes -->
+  <circle cx="183" cy="158" r="6" fill="white"/>
+  <circle cx="217" cy="158" r="6" fill="white"/>
+  <circle cx="184" cy="159" r="3" fill="#333"/>
+  <circle cx="218" cy="159" r="3" fill="#333"/>
+
+  <!-- Smile -->
+  <path d="M188 175 Q200 185 212 175" stroke="#c0845a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Collar -->
+  <path d="M175 205 L200 225 L225 205" stroke="#2d6be4" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Clipboard -->
+  <rect x="215" y="245" width="45" height="55" rx="5" fill="#fff" stroke="#2d6be4" stroke-width="2"/>
+  <rect x="225" y="238" width="25" height="10" rx="3" fill="#2d6be4"/>
+  <line x1="222" y1="262" x2="253" y2="262" stroke="#2d6be4" stroke-width="2"/>
+  <line x1="222" y1="272" x2="253" y2="272" stroke="#2d6be4" stroke-width="2"/>
+  <line x1="222" y1="282" x2="245" y2="282" stroke="#2d6be4" stroke-width="2"/>
+
+  <!-- Left arm -->
+  <rect x="110" y="215" width="35" height="20" rx="10" fill="#e8f0fe"/>
+
+  <!-- Medical cross badge -->
+  <circle cx="200" cy="310" r="25" fill="#2d6be4"/>
+  <rect x="196" y="300" width="8" height="20" rx="2" fill="white"/>
+  <rect x="190" y="306" width="20" height="8" rx="2" fill="white"/>
+
+  <!-- Floating pills decoration -->
+  <ellipse cx="100" cy="150" rx="15" ry="8" fill="white" fill-opacity="0.6" transform="rotate(-30 100 150)"/>
+  <ellipse cx="300" cy="130" rx="12" ry="6" fill="white" fill-opacity="0.6" transform="rotate(20 300 130)"/>
+  <circle cx="320" cy="250" r="8" fill="white" fill-opacity="0.4"/>
+  <circle cx="85" cy="270" r="6" fill="white" fill-opacity="0.4"/>
+
+  <!-- Heart rate line -->
+  <path d="M60 350 L90 350 L100 330 L115 370 L130 340 L145 350 L340 350" stroke="white" stroke-width="2.5" stroke-opacity="0.5" stroke-linecap="round" fill="none"/>
+</svg>
