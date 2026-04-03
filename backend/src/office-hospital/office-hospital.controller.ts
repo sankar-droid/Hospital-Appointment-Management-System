@@ -1,13 +1,17 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, HttpStatus } from '@nestjs/common';
+
+import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { OfficeHospitalService } from './office-hospital.service';
-import { CreateOfficeDto } from '../office/DTOS/createOfficeDTO';
+import { CreateOfficeDTO } from './DTOS/createOfficeDTO';
 import { CreateHospitalDto } from './DTOS/createHospitalDto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RoleGuard } from 'src/auth/role.guard';
 
 @ApiBearerAuth()
 @Roles(Role.Admin)
+@UseGuards(AuthGuard, RoleGuard)
 @Controller('admin')
 export class OfficeHospitalController {
 
@@ -16,7 +20,7 @@ export class OfficeHospitalController {
   // ─── OFFICE ───────────────────────────────────────────────────────────────────
 
   @Post('offices')
-  createOffice(@Body() dto: CreateOfficeDto) {
+  createOffice(@Body() dto: CreateOfficeDTO) {
     return this.officeHospitalService.createOffice(dto);
   }
 
@@ -32,6 +36,23 @@ export class OfficeHospitalController {
     return this.officeHospitalService.getOfficeById(id);
   }
 
+  @Patch('offices/:id')
+  updateOffice(
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
+
+    @Body() dto: Partial<CreateOfficeDTO>
+
+  ) {
+    return this.officeHospitalService.updateOffice(id, dto);
+  }
+
+
+  @Delete('offices/:id')
+  deleteOffice(
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
+  ) {
+    return this.officeHospitalService.deleteOffice(id);
+  }
   // ─── HOSPITAL ─────────────────────────────────────────────────────────────────
 
   @Post('offices/:officeId/hospitals')
@@ -54,5 +75,20 @@ export class OfficeHospitalController {
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
   ) {
     return this.officeHospitalService.getHospitalById(id);
+  }
+
+  @Patch('hospitals/:id')
+  updateHospital(
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
+    @Body() dto: Partial<CreateHospitalDto>
+  ) {
+    return this.officeHospitalService.updateHospital(id, dto);
+  }
+
+  @Delete('hospitals/:id')
+  deleteHospital(
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
+  ) {
+    return this.officeHospitalService.deleteHospital(id);
   }
 }

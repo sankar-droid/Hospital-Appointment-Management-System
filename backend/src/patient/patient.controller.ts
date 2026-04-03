@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, Request, ParseIntPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, ParseIntPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreateClientAccountDto } from './DTOS/createClientAccountDto';
 import { SearchDoctorsDto } from './DTOS/searchDoctorsDto';
@@ -8,9 +8,13 @@ import { RescheduleAppointmentDto } from './DTOS/rescheduleAppointmentDto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
+import { RoleGuard } from 'src/auth/role.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { User } from 'src/auth/user.decorator';
 
 @ApiBearerAuth()
 @Roles(Role.Patient)
+@UseGuards(AuthGuard, RoleGuard)
 @Controller('patient')
 export class PatientController {
 
@@ -19,8 +23,18 @@ export class PatientController {
   // ─── CREATE CLIENT ACCOUNT ────────────────────────────────────────────────────
 
   @Post('account')
-  createClientAccount(@Request() req, @Body() dto: CreateClientAccountDto) {
-    return this.patientService.createClientAccount(req.user.sub, dto);
+  createClientAccount(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
+    @Body() dto: CreateClientAccountDto
+  ) {
+    return this.patientService.createClientAccount(userId, dto);
+  }
+
+  @Get('account')
+  getClientAccount(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number
+  ) {
+    return this.patientService.getClientAccount(userId);
   }
 
   // ─── SEARCH DOCTORS ───────────────────────────────────────────────────────────
@@ -52,46 +66,51 @@ export class PatientController {
   // ─── BOOK APPOINTMENT ────────────────────────────────────────────────────
 
   @Post('appointments/book')
-  bookAppointment(@Request() req, @Body() dto: BookAppointmentDto) {
-    return this.patientService.bookAppointment(req.user.sub, dto);
+  bookAppointment(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
+    @Body() dto: BookAppointmentDto
+  ) {
+    return this.patientService.bookAppointment(userId, dto);
   }
 
   // ─── CANCEL APPOINTMENT ────────────────────────────────────────────────────
 
   @Patch('appointments/:id/cancel')
   cancelAppointment(
-    @Request() req,
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
     @Body() dto: CancelAppointmentDto
   ) {
-    return this.patientService.cancelAppointment(req.user.sub, id, dto);
+    return this.patientService.cancelAppointment(userId, id, dto);
   }
 
   // ─── RESCHEDULE APPOINTMENT ────────────────────────────────────────────────────
 
   @Patch('appointments/:id/reschedule')
   rescheduleAppointment(
-    @Request() req,
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
     @Body() dto: RescheduleAppointmentDto
   ) {
-    return this.patientService.rescheduleAppointment(req.user.sub, id, dto);
+    return this.patientService.rescheduleAppointment(userId, id, dto);
   }
 
   // ─── VIEW OWN APPOINTMENTS ────────────────────────────────────────────────────
 
   @Get('appointments')
-  getOwnAppointments(@Request() req) {
-    return this.patientService.getOwnAppointments(req.user.sub);
+  getOwnAppointments(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number
+  ) {
+    return this.patientService.getOwnAppointments(userId);
   }
 
   // ─── VIEW APPOINTMENT HISTORY ────────────────────────────────────────────────────
 
   @Get('appointments/:id/history')
   getAppointmentHistory(
-    @Request() req,
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
   ) {
-    return this.patientService.getAppointmentHistory(req.user.sub, id);
+    return this.patientService.getAppointmentHistory(userId, id);
   }
 }

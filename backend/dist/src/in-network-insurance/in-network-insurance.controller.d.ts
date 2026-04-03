@@ -8,55 +8,55 @@ export declare class InNetworkInsuranceController {
         doctorHospital: {
             id: number;
             doctorId: number;
-            city: string | null;
-            country: string | null;
-            timeSlotPerClientInMin: number;
-            firstConsultationFee: number;
-            followupConsultationFee: number;
-            streetAddress: string | null;
-            state: string | null;
-            zip: string | null;
             hospitalId: number | null;
             isPrivate: boolean;
+            streetAddress: string | null;
+            city: string | null;
+            state: string | null;
+            country: string | null;
+            zip: string | null;
+            firstConsultationFee: number;
+            followupConsultationFee: number;
+            timeSlotPerClientInMin: number;
         };
     } & {
         id: number;
-        insuranceName: string;
         doctorHospitalId: number;
+        insuranceName: string;
     })[]>;
     findOne(id: number): Promise<{
         doctorHospital: {
             id: number;
             doctorId: number;
-            city: string | null;
-            country: string | null;
-            timeSlotPerClientInMin: number;
-            firstConsultationFee: number;
-            followupConsultationFee: number;
-            streetAddress: string | null;
-            state: string | null;
-            zip: string | null;
             hospitalId: number | null;
             isPrivate: boolean;
+            streetAddress: string | null;
+            city: string | null;
+            state: string | null;
+            country: string | null;
+            zip: string | null;
+            firstConsultationFee: number;
+            followupConsultationFee: number;
+            timeSlotPerClientInMin: number;
         };
     } & {
         id: number;
-        insuranceName: string;
         doctorHospitalId: number;
+        insuranceName: string;
     }>;
-    create(dto: CreateInNetworkInsuranceDto): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
+    create(userId: number, dto: CreateInNetworkInsuranceDto): Promise<{
         id: number;
-        insuranceName: string;
         doctorHospitalId: number;
-    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
-    update(id: number, dto: UpdateInNetworkInsuranceDto): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
+        insuranceName: string;
+    }>;
+    update(userId: number, id: number, dto: UpdateInNetworkInsuranceDto): Promise<{
         id: number;
-        insuranceName: string;
         doctorHospitalId: number;
-    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
-    remove(id: number): import(".prisma/client").Prisma.Prisma__InNetworkInsuranceClient<{
+        insuranceName: string;
+    }>;
+    remove(userId: number, id: number): Promise<{
         id: number;
-        insuranceName: string;
         doctorHospitalId: number;
-    }, never, import("@prisma/client/runtime/client").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+        insuranceName: string;
+    }>;
 }

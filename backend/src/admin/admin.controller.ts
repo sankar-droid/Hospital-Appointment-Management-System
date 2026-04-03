@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Patch, Param, ParseIntPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, ParseIntPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
+import { AuthGuard} from 'src/auth/auth.guard';
+import { RoleGuard } from 'src/auth/role.guard';
 
 @ApiBearerAuth()
 @Roles(Role.Admin)
+@UseGuards(AuthGuard,RoleGuard)
 @Controller('admin')
 export class AdminController {
 
@@ -99,5 +102,13 @@ export class AdminController {
     @Param('specializationId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) specializationId: number
   ) {
     return this.adminService.approveSpecialization(doctorId, specializationId);
+  }
+
+  @Post('specialization-requests/:doctorId/:specializationId/reject')
+  rejectSpecialization(
+    @Param('doctorId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) doctorId: number,
+    @Param('specializationId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) specializationId: number
+  ) {
+    return this.adminService.rejectSpecialization(doctorId, specializationId);
   }
 }

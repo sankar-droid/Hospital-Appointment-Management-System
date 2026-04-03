@@ -1,7 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateAppointmentHistoryDto } from './DTOS/createAppointmentHistoryDTO';
-import { UpdateAppointmentHistoryDto } from './DTOS/updateAppointmentHistoryDTO';
 
 @Injectable()
 export class AppointmentHistoryService {
@@ -9,22 +7,33 @@ export class AppointmentHistoryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
-    return await this.prisma.appointmentHistory.findMany();
+    return this.prisma.appointmentHistory.findMany({
+      include: { appointment: { include: { status: true } } },
+      orderBy: { changedAt: 'desc' }
+    });
   }
 
   async findOne(id: number) {
-    return await this.prisma.appointmentHistory.findUnique({ where: { id } });
+    const record = await this.prisma.appointmentHistory.findUnique({
+      where: { id },
+      include: { appointment: { include: { status: true } } }
+    });
+    if (!record) throw new NotFoundException(`AppointmentHistory #${id} not found`);
+    return record;
   }
 
-  async create(data: CreateAppointmentHistoryDto) {
-    return await this.prisma.appointmentHistory.create({ data });
-  }
+  async findByAppointment(userId: number, appointmentId: number) {
+    const client = await this.prisma.clientAccount.findUnique({ where: { userId } });
+    if (!client) throw new NotFoundException(`Client account not found`);
 
-  async update(id: number, data: UpdateAppointmentHistoryDto) {
-    return await this.prisma.appointmentHistory.update({ where: { id }, data });
-  }
+    const appointment = await this.prisma.appointment.findUnique({ where: { id: appointmentId } });
+    if (!appointment) throw new NotFoundException(`Appointment with id ${appointmentId} not found`);
+    if (appointment.userAccountId !== client.id) throw new BadRequestException(`This appointment does not belong to you`);
 
-  async remove(id: number) {
-    return await this.prisma.appointmentHistory.delete({ where: { id } });
+    return this.prisma.appointmentHistory.findMany({
+      where: { appointmentId },
+      include: { appointment: { include: { status: true } } },
+      orderBy: { changedAt: 'desc' }
+    });
   }
 }

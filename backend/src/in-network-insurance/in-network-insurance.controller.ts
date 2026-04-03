@@ -2,13 +2,16 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseIntPipe,
 import { InNetworkInsuranceService } from './in-network-insurance.service';
 import { CreateInNetworkInsuranceDto } from './DTOS/createInNetworkInsuranceDTO';
 import { UpdateInNetworkInsuranceDto } from './DTOS/updateInNetworkInsuranceDTO';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/role.enum';
+import { User } from 'src/auth/user.decorator';
 
-@Controller('in-network-insurance')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RoleGuard)
+@Controller('in-network-insurance')
 export class InNetworkInsuranceController {
 
   constructor(private readonly inNetworkInsuranceService: InNetworkInsuranceService) {}
@@ -39,17 +42,21 @@ export class InNetworkInsuranceController {
 
   @Post()
   @Roles(Role.Admin, Role.Doctor)
-  async create(@Body() dto: CreateInNetworkInsuranceDto) {
-    return await this.inNetworkInsuranceService.create(dto);
+  async create(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
+    @Body() dto: CreateInNetworkInsuranceDto
+  ) {
+    return await this.inNetworkInsuranceService.create(userId, dto);
   }
 
   @Patch(':id')
   @Roles(Role.Admin, Role.Doctor)
   async update(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
     @Body() dto: UpdateInNetworkInsuranceDto
   ) {
-    return await this.inNetworkInsuranceService.update(id, dto);
+    return await this.inNetworkInsuranceService.update(userId, id, dto);
   }
 
   @Delete('office/:officeId/all')
@@ -60,7 +67,10 @@ export class InNetworkInsuranceController {
 
   @Delete(':id')
   @Roles(Role.Admin, Role.Doctor)
-  async remove(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
-    return await this.inNetworkInsuranceService.remove(id);
+  async remove(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userId: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
+  ) {
+    return await this.inNetworkInsuranceService.remove(userId, id);
   }
 }

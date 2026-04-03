@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Patch, Body, Request, UseGuards, UseInterceptors, UploadedFiles, UploadedFile, Param, ParseIntPipe, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, UseGuards, UseInterceptors, UploadedFiles, UploadedFile, Param, ParseIntPipe, HttpStatus, Res, UseFilters } from '@nestjs/common';
 import { DoctorRoleService } from './doctor-role.service';
-import { UpdateDoctorDto } from '../doctor/DTOS/updateDoctorDTO';
+import { UpdateDoctorSetupProfileDTO } from './DTOS/UpdateDoctorSetupProfileDTO';
 import { SetupProfileDto } from './DTOS/setupProfileDto';
 import { CreatePrivatePracticeDto } from './DTOS/createPrivatePracticeDto';
+import { UpdatePrivatePracticeDto } from './DTOS/updatePrivatePracticeDto';
 import { AffiliateHospitalDto } from './DTOS/affiliateHospitalDto';
 import { SetAvailabilityDto } from './DTOS/setAvailabilityDto';
 import { GenerateTimeSlotsDto } from './DTOS/generateTimeSlotsDto';
@@ -10,11 +11,13 @@ import { MarkUnavailabilityDto } from './DTOS/markUnavailabilityDto';
 import { AuthGuard } from '../auth/auth.guard';
 import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
+
 import { Response } from 'express';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
-
+import {User} from 'src/auth/user.decorator';
+import { CustomExceptionFilter } from 'src/CustomExceptionFilter';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
@@ -22,10 +25,10 @@ import { Roles } from 'src/auth/roles.decorator';
 export class DoctorRoleController {
 
   constructor(private readonly doctorRoleService: DoctorRoleService) {}
-
-  // ─── SETUP PROFILE (ALL IN ONE) ──────────────────────────────────────────────
-
   @Post('setup-profile')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -52,12 +55,13 @@ export class DoctorRoleController {
       cb(null, true);
     }
   }))
-  setupProfile(
-    @Request() req,
+  setupProfile
+  (@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))id:number,
     @Body() dto: SetupProfileDto,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
-    return this.doctorRoleService.setupProfile(req.user.sub, dto, files || []);
+    return this.doctorRoleService.setupProfile(id, dto, files || []);
   }
 
   // ─── GET PROFILE ─────────────────────────────────────────────────────────────
@@ -65,8 +69,10 @@ export class DoctorRoleController {
   @Get('profile')
    @Roles(Role.Doctor)
   @UseGuards(RoleGuard)
-  getProfile(@Request() req) {
-    return this.doctorRoleService.getProfile(req.user.sub);
+  @UseFilters(new CustomExceptionFilter())
+  getProfile(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))id:number) {
+    return this.doctorRoleService.getProfile(id);
   }
 
   // ─── UPDATE BASIC INFO (AFTER VERIFICATION) ──────────────────────────────────
@@ -74,19 +80,25 @@ export class DoctorRoleController {
   @Patch('profile')
   @Roles(Role.Doctor)
   @UseGuards(RoleGuard)
-  updateProfile(@Request() req, @Body() dto: UpdateDoctorDto) {
-    return this.doctorRoleService.updateProfile(req.user.sub, dto);
+  @UseFilters(new CustomExceptionFilter())
+  updateProfile(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))id:number, @Body() dto: UpdateDoctorSetupProfileDTO) {
+    return this.doctorRoleService.updateProfile(id, dto);
   }
 
   // ─── DOCUMENT DOWNLOAD ───────────────────────────────────────────────────────
 
   @Get('documents/:id/download')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
   async downloadDocument(
-    @Request() req,
+    @User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
     @Res() res: Response
   ) {
-    const document = await this.doctorRoleService.downloadDocument(req.user.sub, id);
+    const document = await this.doctorRoleService.downloadDocument(userid, id);
     res.set({
       'Content-Type': 'application/octet-stream',
       'Content-Disposition': `attachment; filename="document-${id}"`
@@ -97,13 +109,20 @@ export class DoctorRoleController {
   // ─── REQUEST VERIFICATION ────────────────────────────────────────────────────
 
   @Patch('request-verification')
-  requestVerification(@Request() req) {
-    return this.doctorRoleService.requestVerification(req.user.sub);
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  requestVerification( @User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number) {
+    return this.doctorRoleService.requestVerification(userid);
   }
 
   // ─── REQUEST SPECIALIZATION ──────────────────────────────────────────────────
 
   @Post('request-specialization/:specializationId')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -123,80 +142,170 @@ export class DoctorRoleController {
     }
   }))
   requestSpecialization(
-    @Request() req,
+    @User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number,
     @Param('specializationId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) specializationId: number,
     @UploadedFile() file: Express.Multer.File
   ) {
-    return this.doctorRoleService.requestSpecialization(req.user.sub, specializationId, file);
+    return this.doctorRoleService.requestSpecialization(userid, specializationId, file);
   }
 
   // ─── AVAILABILITY ────────────────────────────────────────────────────
 
   @Post('availability')
   @Roles(Role.Doctor)
-  setAvailability(@Request() req, @Body() dto: SetAvailabilityDto) {
-    return this.doctorRoleService.setAvailability(req.user.sub, dto);
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  setAvailability(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number,
+    @Body() dto: SetAvailabilityDto
+  ) {
+    return this.doctorRoleService.setAvailability(userid, dto);
   }
 
   @Get('availability/:doctorHospitalId')
   @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
   getAvailability(
-    @Request() req,
+   @User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number,
     @Param('doctorHospitalId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) doctorHospitalId: number
   ) {
-    return this.doctorRoleService.getAvailability(req.user.sub, doctorHospitalId);
+    return this.doctorRoleService.getAvailability(userid, doctorHospitalId);
   }
 
   // ─── TIMESLOT GENERATION ────────────────────────────────────────────────────
 
   @Post('timeslots/generate')
   @Roles(Role.Doctor)
-  generateTimeSlots(@Request() req, @Body() dto: GenerateTimeSlotsDto) {
-    return this.doctorRoleService.generateTimeSlots(req.user.sub, dto);
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  generateTimeSlots(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number, @Body() dto: GenerateTimeSlotsDto) {
+    return this.doctorRoleService.generateTimeSlots(userid, dto);
   }
 
   // ─── UNAVAILABILITY ────────────────────────────────────────────────────
 
   @Post('unavailability')
   @Roles(Role.Doctor)
-  markUnavailability(@Request() req, @Body() dto: MarkUnavailabilityDto) {
-    return this.doctorRoleService.markUnavailability(req.user.sub, dto);
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  markUnavailability(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number, @Body() dto: MarkUnavailabilityDto) {
+    return this.doctorRoleService.markUnavailability(userid, dto);
   }
 
   // ─── APPOINTMENTS ────────────────────────────────────────────────────
 
   @Get('appointments')
   @Roles(Role.Doctor)
-  getOwnAppointments(@Request() req) {
-    return this.doctorRoleService.getOwnAppointments(req.user.sub);
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  getOwnAppointments(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number) {
+    return this.doctorRoleService.getOwnAppointments(userid);
   }
 
   @Patch('appointments/:id/complete')
   @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
   completeAppointment(
-    @Request() req,
+    @User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
   ) {
-    return this.doctorRoleService.completeAppointment(req.user.sub, id);
+    return this.doctorRoleService.completeAppointment(userid, id);
   }
 
   // ─── HOSPITAL AFFILIATION ────────────────────────────────────────────────────
 
   @Post('affiliate')
   @Roles(Role.Doctor)
-  affiliateWithHospital(@Request() req, @Body() dto: AffiliateHospitalDto) {
-    return this.doctorRoleService.affiliateWithHospital(req.user.sub, dto);
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  affiliateWithHospital(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number, @Body() dto: AffiliateHospitalDto) {
+    return this.doctorRoleService.affiliateWithHospital(userid, dto);
   }
 
   // ─── OFFICE MANAGEMENT ──────────────────────────────────────────────────────
 
   @Post('office')
-  createOffice(@Request() req, @Body() dto: CreatePrivatePracticeDto) {
-    return this.doctorRoleService.createOffice(req.user.sub, dto);
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  createOffice(@User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number, @Body() dto: CreatePrivatePracticeDto) {
+    return this.doctorRoleService.createOffice(userid, dto);
+  }
+
+  @Patch('practices/:id')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  updatePractice(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
+    @Body() dto: Partial<CreatePrivatePracticeDto>
+  ) {
+    return this.doctorRoleService.updatePractice(userid, id, dto);
+  }
+
+  @Delete('practices/:id')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  deletePractice(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
+  ) {
+    return this.doctorRoleService.deletePractice(userid, id);
+  }
+
+  @Patch('office/:id')
+  @Roles(Role.Doctor)
+  updatePrivatePractice(
+   @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
+    @Body() dto: UpdatePrivatePracticeDto
+  ) {
+    return this.doctorRoleService.updatePractice(userid, id, dto);
   }
 
   @Get('offices')
-  getOffices(@Request() req) {
-    return this.doctorRoleService.getOffices(req.user.sub);
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  getOffices(@User('sub',new ParseIntPipe({ errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE
+	}))userid:number) {
+    return this.doctorRoleService.getOffices(userid);
+  }
+
+  // ─── AVAILABILITY MANAGEMENT ─────────────────────────────────────────────────
+
+  @Delete('availability/:id')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  deleteAvailability(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number
+  ) {
+    return this.doctorRoleService.deleteAvailability(userid, id);
+  }
+
+  // ─── TIMESLOTS ───────────────────────────────────────────────────────────────
+
+  @Get('timeslots/:doctorHospitalId')
+  @Roles(Role.Doctor)
+  @UseGuards(RoleGuard)
+  @UseFilters(new CustomExceptionFilter())
+  getTimeSlots(
+    @User('sub', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) userid: number,
+    @Param('doctorHospitalId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) doctorHospitalId: number
+  ) {
+    return this.doctorRoleService.getTimeSlots(userid, doctorHospitalId);
   }
 }

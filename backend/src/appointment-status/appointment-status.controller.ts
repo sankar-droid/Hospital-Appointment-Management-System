@@ -1,35 +1,32 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, HttpStatus, UseGuards } from '@nestjs/common';
 import { AppointmentStatusService } from './appointment-status.service';
 import { CreateAppointmentStatusDto } from './DTOS/createAppointmentStatusDTO';
-import { UpdateAppointmentStatusDto } from './DTOS/updateAppointmentStatusDTO';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RoleGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'src/auth/role.enum';
 
+@ApiBearerAuth()
+@Roles(Role.Admin)
+@UseGuards(AuthGuard, RoleGuard)
 @Controller('appointment-status')
 export class AppointmentStatusController {
 
   constructor(private readonly appointmentStatusService: AppointmentStatusService) {}
 
   @Get()
-  async findAll() {
-    return await this.appointmentStatusService.findAll();
+  findAll() {
+    return this.appointmentStatusService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
-    return await this.appointmentStatusService.findOne(id);
+  findOne(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
+    return this.appointmentStatusService.findOne(id);
   }
 
   @Post()
-  async create(@Body() dto: CreateAppointmentStatusDto) {
-    return await this.appointmentStatusService.create(dto);
-  }
-
-  @Patch(':id')
-  async update(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number, @Body() dto: UpdateAppointmentStatusDto) {
-    return await this.appointmentStatusService.update(id, dto);
-  }
-
-  @Delete(':id')
-  async remove(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
-    return await this.appointmentStatusService.remove(id);
+  create(@Body() dto: CreateAppointmentStatusDto) {
+    return this.appointmentStatusService.create(dto);
   }
 }

@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationService } from '../notification-module/notification.service';
 
 @Injectable()
 export class AdminService {
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService
+  ) {}
 
   // ─── USER MANAGEMENT ─────────────────────────────────────────────────────────
 
@@ -114,7 +118,7 @@ export class AdminService {
   async verifyDoctor(id: number) {
     const doctor = await this.prisma.doctor.findUnique({
       where: { id },
-      select: { id: true, firstName: true, lastName: true, isVerified: true, verificationRequested: true, documents: true }
+      select: { id: true, firstName: true, lastName: true, isVerified: true, verificationRequested: true, documents: true, userId: true }
     });
     if (!doctor) throw new NotFoundException(`Doctor with id ${id} not found`);
     if (doctor.isVerified) throw new BadRequestException(`Doctor with id ${id} is already verified`);
@@ -123,6 +127,10 @@ export class AdminService {
 
     const updated = await this.prisma.doctor.updateMany({ where: { id, isVerified: false }, data: { isVerified: true } });
     if (updated.count === 0) throw new BadRequestException(`Doctor is already verified`);
+
+    // Notify doctor
+    const doctorUser = await this.prisma.user.findUnique({ where: { id: doctor.userId } });
+    if (doctorUser) await this.notificationService.notifyDoctorVerified(doctorUser.id);
 
     return { id: doctor.id, firstName: doctor.firstName, lastName: doctor.lastName, isVerified: true, verifiedAt: new Date() };
   }
@@ -229,5 +237,22 @@ export class AdminService {
     if (existing) throw new BadRequestException(`Doctor already has this specialization`);
 
     return this.prisma.doctorSpecialization.create({ data: { doctorId, specializationId } });
+  }
+
+  async rejectSpecialization(doctorId: number, specializationId: number) {
+    const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } });
+    if (!doctor) throw new NotFoundException(`Doctor not found`);
+
+    const specialization = await this.prisma.specialization.findUnique({ where: { id: specializationId } });
+    if (!specialization) throw new NotFoundException(`Specialization not found`);
+
+    const requestDoc = await this.prisma.doctorDocument.findFirst({
+      where: { doctorId, documentType: `SPECIALIZATION_REQUEST_${specializationId}` }
+    });
+    if (!requestDoc) throw new BadRequestException(`No specialization request found for this doctor and specialization`);
+
+    await this.prisma.doctorDocument.delete({ where: { id: requestDoc.id } });
+
+    return { message: `Specialization request rejected and document removed for doctor ${doctorId}` };
   }
 }
